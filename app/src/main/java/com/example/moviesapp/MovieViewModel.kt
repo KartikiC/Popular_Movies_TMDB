@@ -18,7 +18,7 @@ import java.io.IOException
 
 class MovieViewModel(
     app: Application,
-    val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository
 ) : AndroidViewModel(app) {
 
     val popularMovies: MutableLiveData<Resource<MoviesResponse>> = MutableLiveData()
@@ -37,7 +37,7 @@ class MovieViewModel(
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
                 moviePage++
-                if(moviesResponse == null) {
+                if (moviesResponse == null) {
                     moviesResponse = resultResponse
                 } else {
                     val oldMovies = moviesResponse?.results
@@ -53,14 +53,14 @@ class MovieViewModel(
     private suspend fun safeMoviesCall() {
         popularMovies.postValue(Resource.Loading())
         try {
-            if(hasInternetConnection()) {
+            if (hasInternetConnection()) {
                 val response = movieRepository.getPopularMovies(moviePage)
                 popularMovies.postValue(handleMoviesResponse(response))
             } else {
                 popularMovies.postValue(Resource.Error("No Internet Connection"))
             }
         } catch (t: Throwable) {
-            when(t) {
+            when (t) {
                 is IOException -> popularMovies.postValue(Resource.Error("Network Failure"))
                 else -> popularMovies.postValue(Resource.Error("Conversion Error"))
             }
@@ -69,11 +69,13 @@ class MovieViewModel(
 
     private fun hasInternetConnection(): Boolean {
         val connectivityManager = getApplication<MoviesApplication>().getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return  when {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            return when {
                 capabilities.hasTransport(TRANSPORT_WIFI) -> true
                 capabilities.hasTransport(TRANSPORT_CELLULAR) -> true
                 capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
@@ -81,7 +83,7 @@ class MovieViewModel(
             }
         } else {
             connectivityManager.activeNetworkInfo?.run {
-                return when(type) {
+                return when (type) {
                     TYPE_WIFI -> true
                     TYPE_MOBILE -> true
                     TYPE_ETHERNET -> true
@@ -90,5 +92,5 @@ class MovieViewModel(
             }
         }
         return false
-    } 
+    }
 }

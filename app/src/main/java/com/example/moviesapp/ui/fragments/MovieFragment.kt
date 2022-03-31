@@ -22,17 +22,10 @@ class MovieFragment : Fragment(R.layout.movie_fragment) {
     lateinit var viewModel: MovieViewModel
     lateinit var moviesAdapter: MoviesAdapter
 
-    val TAG = "MovieFragment"
-    // var sharedPreferences = activity?.getSharedPreferences("comments_sharedpref",Context.MODE_PRIVATE)
-
-    var comment: String = ""
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = (activity as MovieActivity).viewModel
         setupRecyclerView()
-
-        // comment = sharedPreferences?.getString("comment","").toString()
-        //  Toast.makeText(activity,comment,Toast.LENGTH_SHORT);
 
         moviesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
@@ -52,15 +45,16 @@ class MovieFragment : Fragment(R.layout.movie_fragment) {
                         moviesAdapter.differ.submitList(moviesResponse.results.toList())
                         val totalPages = moviesResponse.totalResults / QUERY_PAGE_SIZE + 2
                         isLastPage = viewModel.moviePage == totalPages
-                        if(isLastPage) {
-                            rvMovies.setPadding(0,0,0,0)
+                        if (isLastPage) {
+                            rvMovies.setPadding(0, 0, 0, 0)
                         }
                     }
                 }
                 is Resource.Error -> {
                     hideProgressBar()
                     response.message?.let { message ->
-                        Toast.makeText(activity,"An error occured: $message",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "An error occured: $message", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
                 is Resource.Loading -> {

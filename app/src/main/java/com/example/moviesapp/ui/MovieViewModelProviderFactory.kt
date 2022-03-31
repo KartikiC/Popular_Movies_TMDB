@@ -7,7 +7,7 @@ import com.example.moviesapp.MovieViewModel
 
 class MovieViewModelProviderFactory(
     val app: Application,
-    val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return MovieViewModel(app, movieRepository) as T
